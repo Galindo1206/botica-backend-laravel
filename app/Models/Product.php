@@ -19,14 +19,25 @@ class Product extends Model
         'description',
         'image_path',
         'stock',
+        'sale_price',
         'requires_prescription',
         'is_active',
+    ];
+    protected $appends = [
+        'image_url',
     ];
 
     protected $casts = [
         'requires_prescription' => 'boolean',
         'is_active' => 'boolean',
+        'sale_price' => 'decimal:2',
     ];
+    public function getImageUrlAttribute()
+    {
+        return $this->image_path
+            ? asset('storage/' . $this->image_path)
+            : null;
+    }
 
     public function category()
     {

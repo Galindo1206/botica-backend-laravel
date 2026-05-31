@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -30,11 +31,16 @@ class ProductController extends Controller
             'barcode' => 'nullable|string|max:80|unique:products,barcode',
             'health_registration' => 'nullable|string|max:80',
             'description' => 'nullable|string',
-            'image_path' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'stock' => 'nullable|integer|min:0',
+            'sale_price' => 'required|numeric|min:0',
             'requires_prescription' => 'boolean',
             'is_active' => 'boolean',
         ]);
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $data['image_path'] = $path;
+        }
 
         $product = Product::create($data);
 
@@ -64,12 +70,26 @@ class ProductController extends Controller
             'barcode' => 'nullable|string|max:80|unique:products,barcode,' . $product->id,
             'health_registration' => 'nullable|string|max:80',
             'description' => 'nullable|string',
-            'image_path' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'stock' => 'nullable|integer|min:0',
+            'sale_price' => 'required|numeric|min:0',
             'requires_prescription' => 'boolean',
             'is_active' => 'boolean',
         ]);
+        if ($request->hasFile('image')) {
 
+            if (
+                $product->image_path &&
+                Storage::disk('public')->exists($product->image_path)
+            ) {
+
+                Storage::disk('public')->delete($product->image_path);
+            }
+
+            $path = $request->file('image')->store('products', 'public');
+
+            $data['image_path'] = $path;
+        }
         $product->update($data);
 
         return response()->json([
