@@ -13,7 +13,8 @@ class ProductController extends Controller
     {
         $products = Product::with('category')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->map(fn (Product $product) => $this->withImageUrl($product));
 
         return response()->json($products);
     }
@@ -46,14 +47,14 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Producto creado correctamente',
-            'data' => $product->load('category'),
+            'data' => $this->withImageUrl($product->load('category')),
         ], 201);
     }
 
     public function show(Product $product)
     {
         return response()->json(
-            $product->load(['category', 'batches'])
+            $this->withImageUrl($product->load(['category', 'batches']))
         );
     }
 
@@ -94,7 +95,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Producto actualizado correctamente',
-            'data' => $product->load('category'),
+            'data' => $this->withImageUrl($product->load('category')),
         ]);
     }
 
@@ -107,5 +108,18 @@ class ProductController extends Controller
         return response()->json([
             'message' => 'Producto desactivado correctamente',
         ]);
+    }
+
+    private function withImageUrl(Product $product): array
+    {
+        $imageExists = $product->image_path &&
+            Storage::disk('public')->exists($product->image_path);
+
+        return [
+            ...$product->toArray(),
+            'image_url' => $imageExists
+                ? asset('storage/' . $product->image_path)
+                : null,
+        ];
     }
 }

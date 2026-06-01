@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\PasswordResetCode;
@@ -34,6 +35,8 @@ class AuthController extends Controller
                 'password.regex' => 'La contraseña debe contener al menos una mayúscula y un número.',
             ]
         );
+
+        $data['role_id'] ??= Role::where('name', 'Cliente')->value('id');
 
         $user = User::create($data);
 
