@@ -174,12 +174,17 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        $product->update([
-            'is_active' => false,
-        ]);
+        if (
+            $product->image_path &&
+            Storage::disk('public')->exists($product->image_path)
+        ) {
+            Storage::disk('public')->delete($product->image_path);
+        }
+
+        $product->delete();
 
         return response()->json([
-            'message' => 'Producto desactivado correctamente',
+            'message' => 'Producto eliminado correctamente',
         ]);
     }
 
