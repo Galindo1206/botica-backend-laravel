@@ -20,6 +20,7 @@ Route::post('/login', [AuthController::class, 'login'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout-all', [AuthController::class, 'logoutAll']);
+    Route::post('/products/import', [ProductController::class, 'import']);
     Route::apiResource('products', ProductController::class);
     Route::get('/roles', [UserController::class, 'roles']);
     Route::patch('/users/{user}/recover', [UserController::class, 'recover']);
