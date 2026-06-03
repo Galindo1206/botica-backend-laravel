@@ -6,10 +6,13 @@ use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\PublicationController;
 use Illuminate\Support\Facades\Mail;
 
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('suppliers', SupplierController::class);
+Route::get('/publications', [PublicationController::class, 'index']);
+Route::get('/publications/{publication}', [PublicationController::class, 'show']);
 
 
 
@@ -26,6 +29,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/users/{user}/recover', [UserController::class, 'recover']);
     Route::delete('/users/{user}/force', [UserController::class, 'forceDestroy']);
     Route::apiResource('users', UserController::class);
+    Route::get('/admin/publications', [PublicationController::class, 'adminIndex']);
+    Route::post('/admin/publications', [PublicationController::class, 'store']);
+    Route::get('/admin/publications/{publication}', [PublicationController::class, 'adminShow']);
+    Route::put('/admin/publications/{publication}', [PublicationController::class, 'update']);
+    Route::patch('/admin/publications/{publication}', [PublicationController::class, 'update']);
+    Route::delete('/admin/publications/{publication}', [PublicationController::class, 'destroy']);
 });
 
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -50,3 +59,4 @@ Route::post(
     '/verify-email',
     [AuthController::class, 'verifyEmail']
 );
+
